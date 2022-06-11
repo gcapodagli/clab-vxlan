@@ -10,3 +10,5 @@ destroy.sh destroys the network laboratory
 open.sh to access a container (the name must be inserted as an input argument)
 
 graph.sh shows the topology at http://0.0.0.0:50080
+
+ip.sh, ovs1.sh and ovs2.sh configure addresses, routing and VxLAN rules
