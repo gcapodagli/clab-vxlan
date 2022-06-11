@@ -1,0 +1,62 @@
+name: vxlan
+
+topology:
+
+  kinds:
+    linux:
+      cpu: 1
+      memory: 128mb
+      image: alpine:latest
+      publish:
+        - tcp/22
+      exec:
+        - apk update
+        - apk add bash iproute2 tcpdump
+
+  nodes:
+    router:
+      kind: linux
+      mgmt_ipv4: 172.20.20.2
+    #router:
+    #kind: linux
+    #image: ubuntu:latest
+    #mgmt_ipv4: 172.20.20.2
+    #exec:
+    #  - apt update
+    #  - apt install -y iproute2 tcpdump iputils-ping net-tools
+    vtep1:
+      kind: linux
+      mgmt_ipv4: 172.20.20.3
+      exec:
+        - apk add openrc openvswitch uuidgen
+        - rc-update add ovs-modules
+        - rc-update add ovsdb-server
+        - rc-update add ovs-vswitchd
+    vtep2:
+      kind: linux
+      mgmt_ipv4: 172.20.20.4
+      exec:
+        - apk add openrc openvswitch uuidgen
+        - rc-update add ovs-modules
+        - rc-update add ovsdb-server
+        - rc-update add ovs-vswitchd
+    blue1:
+      kind: linux
+      mgmt_ipv4: 172.20.20.5
+    blue2:
+      kind: linux
+      mgmt_ipv4: 172.20.20.6
+    black1:
+      kind: linux
+      mgmt_ipv4: 172.20.20.7
+    black2:
+      kind: linux
+      mgmt_ipv4: 172.20.20.8
+    
+  links:
+    - endpoints: ["router:eth1", "vtep1:eth1"]
+    - endpoints: ["router:eth2", "vtep2:eth1"]
+    - endpoints: ["black1:eth1", "vtep1:eth2"]
+    - endpoints: ["blue1:eth1", "vtep1:eth3"]
+    - endpoints: ["black2:eth1", "vtep2:eth2"]
+    - endpoints: ["blue2:eth1", "vtep2:eth3"]
